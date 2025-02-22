@@ -38,6 +38,32 @@
 #define LED_ROWS 5
 #define LED_COLS 5
 
+// Add UART definitions
+#define UART_ID uart0
+#define BAUD_RATE 115200
+#define UART_TX_PIN 0
+#define UART_RX_PIN 1
+
+#define MIC_PIN 28  // ADC2
+#define SOUND_THRESHOLD 2300  // Ajuste este valor conforme a sensibilidade desejada
+
+
+// Estrutura para armazenar dados do treino
+typedef struct {
+    uint32_t duracao;
+    uint16_t bpm_max;
+    uint16_t bpm_min;
+    uint16_t bpm_medio;
+    uint16_t forca_maxima;
+    uint16_t pontuacao_a;
+    uint16_t pontuacao_b;
+    uint16_t quedas;  // Nova variável para contar quedas
+} DadosTreino;
+
+DadosTreino dados_treino = {0};
+uint32_t amostras_bpm = 0;
+uint32_t soma_bpm = 0;
+
 // Estrutura para definir uma nota musical
 typedef struct {
     uint16_t freq;
@@ -59,6 +85,8 @@ uint slice_num_buzzer;
 bool melodia_tocando = false;
 uint32_t ultima_nota = 0;
 uint8_t nota_atual = 0;
+uint32_t ultimo_tempo_queda = 0;
+const uint32_t DEBOUNCE_QUEDA = 1000; // Tempo mínimo entre quedas (ms)
 
 
 // Display OLED
@@ -96,6 +124,46 @@ void definir_frequencia_buzzer(uint16_t freq);
 void desligar_buzzer(void);
 void tocar_melodia(void);
 void atualizar_melodia(void);
+
+void inicializar_uart() {
+    uart_init(UART_ID, BAUD_RATE);
+    gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
+    gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
+}
+
+// Função para ler o microfone
+uint16_t ler_microfone() {
+    adc_select_input(2);  // ADC2 corresponde ao GPIO28
+    return adc_read();
+}
+
+// Função para enviar dados via UART
+void enviar_dados_treino() {
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), 
+        "{"
+        "\"duracao\":%lu,"
+        "\"bpm_max\":%u,"
+        "\"bpm_min\":%u,"
+        "\"bpm_medio\":%u,"
+        "\"forca_maxima\":%u,"
+        "\"pontuacao_a\":%u,"
+        "\"pontuacao_b\":%u,"
+        "\"quedas\":%u"
+        "}\n",
+        dados_treino.duracao,
+        dados_treino.bpm_max,
+        dados_treino.bpm_min,
+        dados_treino.bpm_medio,
+        dados_treino.forca_maxima,
+        dados_treino.pontuacao_a,
+        dados_treino.pontuacao_b,
+        dados_treino.quedas
+    );
+    printf("%s", buffer);
+    uart_puts(UART_ID, buffer);
+    sleep_ms(100);
+}
 
 // Funções do buzzer
 void configurar_buzzer(void) {
@@ -247,6 +315,8 @@ void atualizar_oled() {
     ssd1306_draw_string(&display, buffer, 10, 20);
     snprintf(buffer, sizeof(buffer), "FORCA: %d", total_forca);
     ssd1306_draw_string(&display, buffer, 10, 30);
+    snprintf(buffer, sizeof(buffer), "QUEDAS: %d", dados_treino.quedas);
+    ssd1306_draw_string(&display, buffer, 10, 40);
     ssd1306_send_data(&display);
 }
 
@@ -288,6 +358,7 @@ void setup() {
     adc_init();
     adc_gpio_init(FORCE_SENSOR_X);
     adc_gpio_init(FORCE_SENSOR_Y);
+    adc_gpio_init(MIC_PIN);
     i2c_init(I2C_PORT, 400000);
     gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
@@ -298,7 +369,7 @@ void setup() {
     iniciar_pwm(LED_PWM_PIN);
     init_leds();
     configurar_buzzer(); 
-    
+    inicializar_uart();
     printf("Calibrando joystick...\n");
     sleep_ms(500);
     offset_x = adc_read();
@@ -306,24 +377,82 @@ void setup() {
     offset_y = adc_read();
     printf("Calibração concluída! Offsets - X: %d, Y: %d\n", offset_x, offset_y);
     atualizar_oled();
+    dados_treino.quedas = 0;
+
+     // Inicializar dados do treino
+     dados_treino.bpm_min = 0xFFFF;  // Valor máximo para começar
+     dados_treino.bpm_max = 0;
+     dados_treino.bpm_medio = 0;
+     dados_treino.forca_maxima = 0;
 }
 
 void loop() {
     while (true) {
         if (gpio_get(BTN_START) == 0) {
-            treino_ativo = !treino_ativo;
-            inicio_treino = to_ms_since_boot(get_absolute_time());
-            sleep_ms(300);
-
             if (!treino_ativo) {
-                desligar_buzzer();
+                // Início do treino
+                treino_ativo = true;
+                inicio_treino = to_ms_since_boot(get_absolute_time());
+                amostras_bpm = 0;
+                soma_bpm = 0;
+                dados_treino.bpm_min = 0xFFFF;
+                dados_treino.bpm_max = 0;
+                dados_treino.forca_maxima = 0;
+                dados_treino.quedas = 0;  // Reinicia contador de quedas
+            } else {
+                // Fim do treino
+                treino_ativo = false;
+                dados_treino.duracao = (to_ms_since_boot(get_absolute_time()) - inicio_treino) / 1000;
+                dados_treino.bpm_medio = (amostras_bpm > 0) ? (soma_bpm / amostras_bpm) : 0;
+                dados_treino.pontuacao_a = pontos_a;
+                dados_treino.pontuacao_b = pontos_b;
+                enviar_dados_treino();
             }
+            sleep_ms(300);
         }
 
         if (treino_ativo) {
+            // Detectar quedas pelo som
+            uint16_t nivel_som = ler_microfone();
+            uint32_t tempo_atual = to_ms_since_boot(get_absolute_time());
+
+
+            if (nivel_som > SOUND_THRESHOLD && (tempo_atual - ultimo_tempo_queda) > DEBOUNCE_QUEDA) {
+                dados_treino.quedas++;
+                ultimo_tempo_queda = tempo_atual;
+                
+                
+                // Feedback visual e sonoro da queda
+                tocar_melodia();
+                
+                // Piscar todos os LEDs em vermelho
+                for (int i = 0; i < LED_COUNT; i++) {
+                    set_led(i, 255, 0, 0);
+                }
+                write_leds();
+                sleep_ms(100);
+                clear_leds();
+                write_leds();
+            }
+
+
             forca_x = medir_forca_x();
             forca_y = medir_forca_y();
             ajustar_batimentos();
+
+            uint16_t total_forca = (abs(forca_x) + abs(forca_y)) / 2;
+            if (total_forca > dados_treino.forca_maxima) {
+                dados_treino.forca_maxima = total_forca;
+            }
+            if (batimentos > dados_treino.bpm_max) {
+                dados_treino.bpm_max = batimentos;
+            }
+            if (batimentos < dados_treino.bpm_min) {
+                dados_treino.bpm_min = batimentos;
+            }
+            soma_bpm += batimentos;
+            amostras_bpm++;
+
             atualizar_oled();
             atualizar_matriz_leds(batimentos);
 
@@ -342,7 +471,6 @@ void loop() {
             if (intensidade > 4095) intensidade = 4095;
             set_pwm_duty(LED_PWM_PIN, intensidade);
 
-            uint16_t total_forca = (abs(forca_x) + abs(forca_y)) / 2;
             if (total_forca < 200) {
                 uint32_t tempo_atual = to_ms_since_boot(get_absolute_time());
                 if (tempo_atual - ultimo_tempo_forca_baixa >= 5000) {
