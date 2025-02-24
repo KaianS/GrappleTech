@@ -44,25 +44,33 @@ git clone https://github.com/kaians/grappletech.git
 ## 📁 Estrutura do Projeto
 
 ```
-Copygrappletech/
+grappletech/
 ├── src/
-│   ├── main.cpp
-│   ├── drivers/
-│   │   ├── display.cpp
-│   │   ├── led_matrix.cpp
-│   │   └── sensors.cpp
-│   └── utils/
-│       ├── training.cpp
-│       └── communications.cpp
-├── include/
-│   └── headers/
-├── lib/
-│   └── dependencies/
-└── platformio.ini
+│   ├── buzzer.c
+│   ├── buzzer.h
+│   ├── config.h
+│   ├── display.c
+│   ├── display.h
+│   ├── hardware.c
+│   ├── hardware.h
+│   ├── leds.c
+│   ├── leds.h
+│   ├── main.c
+│   ├── sensores.c
+│   ├── sensores.h
+│   ├── treino.c
+│   ├── treino.h
+├── ssd1306.c
+├── ssd1306.h 
+├── ws2818b.pio
 
 ```
 
 ## Vídeo Demonstração
+
+[![Watch the video](https://img.youtube.com/vi/vhW9ee2U6Go/maxresdefault.jpg)](https://youtu.be/vhW9ee2U6Go)
+
+### [Vídeo Demonstração GrappleTech](https://youtu.be/vhW9ee2U6Go)
 
 ```
 
