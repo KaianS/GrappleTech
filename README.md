@@ -36,9 +36,13 @@ git clone https://github.com/kaians/grappletech.git
 ```
 
 4. Acesse o repositório clonado, compile e envie o código para placa.
-5. (opcional) Configure e clone o repositório para simulação UART.
+5. (opcional) Configure e clone o repositório abaixo para simulação UART:
 ```bash
-git clone https://github.com/kaians/grappletech.git
+git clone https://github.com/KaianS/grappletech-front-end.git
+```
+6. Link direto para repositório:
+```bash
+https://github.com/KaianS/grappletech-front-end
 ```
 
 ## 📁 Estrutura do Projeto
@@ -66,11 +70,9 @@ grappletech/
 
 ```
 
-## Vídeo Demonstração
+## 📹 Vídeo Demonstração
 
 [![Watch the video](https://img.youtube.com/vi/vhW9ee2U6Go/maxresdefault.jpg)](https://youtu.be/vhW9ee2U6Go)
-
-### [Vídeo Demonstração GrappleTech](https://youtu.be/vhW9ee2U6Go)
 
 ```
 
