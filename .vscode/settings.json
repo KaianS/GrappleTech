@@ -39,6 +39,19 @@
     "files.associations": {
         "watchdog.h": "c",
         "tcp.h": "c",
-        "adc.h": "c"
+        "adc.h": "c",
+        "stdio.h": "c",
+        "training.h": "c",
+        "stdlib.h": "c",
+        "cyw43_arch.h": "c",
+        "config.h": "c",
+        "buzzer.h": "c",
+        "led_matrix.h": "c",
+        "sensors.h": "c",
+        "display.h": "c",
+        "stdint.h": "c",
+        "ssd1306.h": "c",
+        "cstdint": "cpp",
+        "compare": "cpp"
     }
 }

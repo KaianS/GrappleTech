@@ -37,7 +37,14 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Grapple Grapple.c ssd1306.c)
+add_executable(Grapple 
+src/main.c
+src/hardware.c
+src/display.c
+src/leds.c
+src/buzzer.c
+src/sensores.c
+src/treino.c ssd1306.c)
 
 pico_set_program_name(Grapple "Grapple")
 pico_set_program_version(Grapple "0.1")

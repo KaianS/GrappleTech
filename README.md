@@ -1,9 +1,5 @@
 ﻿# 🥋 GrappleTech
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform: Raspberry Pi Pico](https://img.shields.io/badge/Platform-Raspberry%20Pi%20Pico-blue.svg)](https://www.raspberrypi.com/products/raspberry-pi-pico/)
-[![Language: C/C++](https://img.shields.io/badge/Language-C%2FC%2B%2B-red.svg)](https://en.wikipedia.org/wiki/C%2B%2B)
-
 GrappleTech é um sistema embarcado inovador projetado para monitoramento e análise de treinos de jiu-jitsu. Utilizando sensores de força e detecção de quedas, o sistema fornece feedback em tempo real sobre a intensidade do treino e registra eventos importantes durante a prática.
 
 ![GrappleTech Demo](bjj-jiu-jitsu.gif)
@@ -39,31 +35,19 @@ GrappleTech é um sistema embarcado inovador projetado para monitoramento e aná
 - Sensores de força (2x)
 - Buzzer
 - Botões (3x)
-- Cabos e conectores diversos
+- Cabos e conectores necessários
 
 ## 🛠️ Configuração do Ambiente
 
 1. Instale o VSCode
-2. Instale a extensão PlatformIO
+2. Configure o ambiente para placa BitDogLab
 3. Clone este repositório:
 ```bash
 git clone https://github.com/kaians/grappletech.git
 ```
 
-4. Abra o projeto no VSCode com PlatformIO
+4. Acesse o repositório clonado, compile e envie o código para placa.
 
-## 📥 Instalação
-
-1. Conecte o Raspberry Pi Pico ao computador
-2. Abra o projeto no PlatformIO
-3. Execute o comando de build:
-```bash
-pio run
-```
-
-4. Faça o upload do firmware:
-```bash
-pio run --target upload
 ```
 
 ## 🎮 Uso
@@ -125,9 +109,6 @@ Contribuições são bem-vindas! Por favor, leia nosso guia de contribuição an
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
 
 ## 🙏 Agradecimentos
 
