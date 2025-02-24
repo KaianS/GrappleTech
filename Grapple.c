@@ -122,7 +122,7 @@ void atualizar_matriz_leds(uint16_t bpm);
 void configurar_buzzer(void);
 void definir_frequencia_buzzer(uint16_t freq);
 void desligar_buzzer(void);
-void tocar_melodia(void);
+void tocar_alerta(void);
 void atualizar_melodia(void);
 
 void inicializar_uart() {
@@ -194,7 +194,7 @@ void desligar_buzzer(void) {
     nota_atual = 0;
 }
 
-void tocar_melodia(void) {
+void tocar_alerta(void) {
     if (!melodia_tocando) {
         melodia_tocando = true;
         nota_atual = 0;
@@ -320,19 +320,34 @@ void atualizar_oled() {
     ssd1306_send_data(&display);
 }
 
-// Ajusta os batimentos baseando-se na força aplicada
 void ajustar_batimentos() {
     static int16_t forca_anterior_x = 0, forca_anterior_y = 0;
     int16_t variacao_x = abs(forca_x - forca_anterior_x);
     int16_t variacao_y = abs(forca_y - forca_anterior_y);
     int16_t variacao_forca = variacao_x + variacao_y;
+    uint16_t total_forca = (abs(forca_x) + abs(forca_y)) / 2;
 
+    // Ajusta o batimentos_alvo baseado na variação de força
     if (variacao_forca > 1000) {
         batimentos_alvo += 10;
     } else if (variacao_forca < -1000) {
         batimentos_alvo -= 5;
     }
+    
+    // Ajusta o batimentos_alvo também quando a força total é baixa
+    if (total_forca < 200) {
+        uint32_t tempo_atual = to_ms_since_boot(get_absolute_time());
+        if (tempo_atual - ultimo_tempo_forca_baixa >= 10000) {
+            batimentos_alvo -= 10;
+            ultimo_tempo_forca_baixa = tempo_atual;
+        }
+    }
+    
+    // Mantém batimentos_alvo dentro de limites razoáveis
+    if (batimentos_alvo < 40) batimentos_alvo = 40;
+    if (batimentos_alvo > 180) batimentos_alvo = 180;
 
+    // Faz os batimentos convergirem para o alvo
     if (batimentos < batimentos_alvo) {
         batimentos += 1 + (rand() % 2);
     } else if (batimentos > batimentos_alvo) {
@@ -423,7 +438,7 @@ void loop() {
                 
                 
                 // Feedback visual e sonoro da queda
-                tocar_melodia();
+                tocar_alerta();
                 
                 // Piscar todos os LEDs em vermelho
                 for (int i = 0; i < LED_COUNT; i++) {
@@ -458,7 +473,7 @@ void loop() {
 
             // Verifica os batimentos e controla o buzzer
             if (batimentos >= BPM_LIMITE) {
-                tocar_melodia();
+                tocar_alerta();
             } else if (batimentos < BPM_LIMITE - 5) { // Histerese para evitar oscilação
                 desligar_buzzer();
             }
@@ -470,16 +485,6 @@ void loop() {
             uint16_t intensidade = (abs(forca_x) + abs(forca_y)) / 2;
             if (intensidade > 4095) intensidade = 4095;
             set_pwm_duty(LED_PWM_PIN, intensidade);
-
-            if (total_forca < 200) {
-                uint32_t tempo_atual = to_ms_since_boot(get_absolute_time());
-                if (tempo_atual - ultimo_tempo_forca_baixa >= 5000) {
-                    batimentos -= 10;
-                    if (batimentos < 40) batimentos = 40;
-                    if (batimentos > 180) batimentos = 180;
-                    ultimo_tempo_forca_baixa = tempo_atual;
-                }
-            }
         } else {
             desligar_buzzer();  // Desativa o buzzer quando o treino não está ativo
         }
