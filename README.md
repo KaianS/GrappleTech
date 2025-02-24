@@ -4,17 +4,6 @@ GrappleTech é um sistema embarcado inovador projetado para monitoramento e aná
 
 ![GrappleTech Demo](bjj-jiu-jitsu.gif)
 
-## 📋 Sumário
-- [Características](#características)
-- [Hardware Necessário](#hardware-necessário)
-- [Configuração do Ambiente](#configuração-do-ambiente)
-- [Instalação](#instalação)
-- [Uso](#uso)
-- [Funcionalidades](#funcionalidades)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Contribuição](#contribuição)
-- [Licença](#licença)
-
 ## ✨ Características
 
 - 💪 Monitoramento de força em dois eixos
@@ -47,48 +36,75 @@ git clone https://github.com/kaians/grappletech.git
 ```
 
 4. Acesse o repositório clonado, compile e envie o código para placa.
+5. (opcional) Configure e clone o repositório para simulação UART.
+```bash
+git clone https://github.com/kaians/grappletech.git
+```
+
+## 📁 Estrutura do Projeto
+
+```
+Copygrappletech/
+├── src/
+│   ├── main.cpp
+│   ├── drivers/
+│   │   ├── display.cpp
+│   │   ├── led_matrix.cpp
+│   │   └── sensors.cpp
+│   └── utils/
+│       ├── training.cpp
+│       └── communications.cpp
+├── include/
+│   └── headers/
+├── lib/
+│   └── dependencies/
+└── platformio.ini
 
 ```
 
-## 🎮 Uso
+## Vídeo Demonstração
 
-1. **Calibração Inicial**
+```
+
+🎮 Uso
+
+1. Calibração Inicial
    - Ligue o sistema
    - Aguarde a calibração automática dos sensores (5 segundos)
 
-2. **Início do Treino**
+2. Início do Treino
    - Pressione o botão START para iniciar
    - O display mostrará as informações em tempo real
 
-3. **Durante o Treino**
+3. Durante o Treino
    - Monitore a intensidade através da matriz LED
    - Observe os batimentos simulados no display
    - Use os botões A e B para registrar pontos
 
-4. **Finalização**
+4. Finalização
    - Pressione START novamente para encerrar
    - Os dados serão enviados via serial
 
-## 🎯 Funcionalidades
+🎯 Funcionalidades
 
-### Sistema de Força
+Sistema de Força
 - Medição contínua em dois eixos
 - Calibração automática
 - Escala de 0-4095 para cada eixo
 
-### Detecção de Quedas
+Detecção de Quedas
 - Monitoramento via microfone
 - Threshold configurável
 - Debounce de 1 segundo
 - Feedback visual e sonoro
 
-### Simulação de Batimentos
+Simulação de Batimentos
 - Range: 40-180 BPM
 - Ajuste baseado na intensidade
 - Decaimento automático
 - Alertas de limite superior
 
-### Interface Visual
+Interface Visual
 - Display OLED:
   - Tempo de treino
   - BPM atual
@@ -110,9 +126,3 @@ Contribuições são bem-vindas! Por favor, leia nosso guia de contribuição an
 5. Abra um Pull Request
 
 
-## 🙏 Agradecimentos
-
-- EmbarcaTech
-
----
-por [Kaian Gonçalves](https://github.com/KaianS)
