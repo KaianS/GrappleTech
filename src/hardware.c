@@ -52,10 +52,10 @@ void inicializar_hardware() {
  */
 void iniciar_pwm(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_PWM); // Configura o pino como função PWM
-    uint slice_num = pwm_gpio_to_slice_num(gpio); // Obtém o número da fatia PWM associada ao pino
+    uint slice_num = pwm_gpio_to_slice_num(gpio); // Obtém o número da slice PWM associada ao pino
     pwm_set_wrap(slice_num, 4095); // Define o valor máximo do contador PWM (4095)
     pwm_set_gpio_level(slice_num, 0); // Define o nível inicial do PWM para 0 (desligado)
-    pwm_set_enabled(slice_num, true); // Habilita a fatia PWM
+    pwm_set_enabled(slice_num, true); // Habilita a slice PWM
 }
 
 /**
@@ -67,7 +67,7 @@ void iniciar_pwm(uint gpio) {
  * @param valor O valor do duty cycle (0-4095).
  */
 void set_pwm_duty(uint gpio, uint16_t valor) {
-    uint slice_num = pwm_gpio_to_slice_num(gpio); // Obtém o número da fatia PWM associada ao pino
+    uint slice_num = pwm_gpio_to_slice_num(gpio); // Obtém o número da slice PWM associada ao pino
     pwm_set_gpio_level(gpio, valor); // Define o nível do PWM para o valor especificado
 }
 

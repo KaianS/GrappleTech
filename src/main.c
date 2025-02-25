@@ -167,10 +167,10 @@ int main()
                 desligar_buzzer(); // Desliga o buzzer se os batimentos estiverem abaixo do limite
             }
 
-            // Atualiza a melodia do buzzer, se estiver tocando
-            if (melodia_tocando)
+            // Atualiza a alerta do buzzer, se estiver tocando
+            if (alerta_tocando)
             {
-                atualizar_melodia();
+                atualizar_alerta();
             }
 
             // Ajusta o brilho do LED PWM com base na força total

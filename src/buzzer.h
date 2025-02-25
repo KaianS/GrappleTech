@@ -32,33 +32,33 @@ void configurar_buzzer(void);
 void definir_frequencia_buzzer(uint16_t freq);
 
 /**
- * @brief Desliga o buzzer e para a reprodução da melodia.
+ * @brief Desliga o buzzer e para a reprodução da alerta.
  *
- * Interrompe a emissão de som pelo buzzer e reinicia o estado da melodia.
+ * Interrompe a emissão de som pelo buzzer e reinicia o estado da alerta.
  */
 void desligar_buzzer(void);
 
 /**
- * @brief Inicia a reprodução da melodia de alerta.
+ * @brief Inicia a reprodução da alerta de alerta.
  *
  * Começa a tocar a sequência de notas definida para o alerta.
  */
 void tocar_alerta(void);
 
 /**
- * @brief Atualiza a melodia, avançando para a próxima nota.
+ * @brief Atualiza a alerta, avançando para a próxima nota.
  *
- * Controla a progressão da melodia, trocando de nota com base na duração definida.
+ * Controla a progressão da alerta, trocando de nota com base na duração definida.
  */
-void atualizar_melodia(void);
+void atualizar_alerta(void);
 
 /**
- * @brief Indica se uma melodia está sendo tocada.
+ * @brief Indica se uma alerta está sendo tocada.
  *
- * Esta variável externa indica se o buzzer está atualmente tocando uma melodia.
+ * Esta variável externa indica se o buzzer está atualmente tocando uma alerta.
  *
  * @note Deve ser definida no arquivo .c correspondente.
  */
-extern bool melodia_tocando;
+extern bool alerta_tocando;
 
 #endif // BUZZER_H
